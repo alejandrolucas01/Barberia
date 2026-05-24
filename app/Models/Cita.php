@@ -14,7 +14,8 @@ class Cita extends Model
         'hora_inicio',
         'hora_fin',
         'tipo_atencion',
-        'estado'
+        'estado',
+        'metodo_pago'
     ];
 
     public function barbero()

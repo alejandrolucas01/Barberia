@@ -42,7 +42,7 @@
                                     <a href="{{ route('admin.servicios.edit', $servicio->id) }}"
                                         class="text-sm py-1.5 px-3 text-center bg-white border border-slate-200 text-slate-700 text-xs font-medium rounded-md hover:bg-slate-50 transition-colors mr-2">Editar</a>
                                     <form action="{{ route('admin.servicios.destroy', $servicio->id) }}" method="POST"
-                                        onsubmit="return confirm('¿Eliminar servicio?');" class="inline">
+                                        class="inline form-eliminar" data-title="¿Eliminar servicio?" data-warning="Esta acción no se puede deshacer.">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
@@ -53,6 +53,9 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-4">
+                    {{ $servicios->links() }}
+                </div>
             @endif
         </div>
     </div>

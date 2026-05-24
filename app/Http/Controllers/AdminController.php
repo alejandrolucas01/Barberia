@@ -14,6 +14,7 @@ class AdminController extends Controller
         return view('admin.sucursales.create');
     }
 
+
     public function storeSucursal(Request $request)
     {
         $request->validate([
@@ -29,6 +30,7 @@ class AdminController extends Controller
 
         return redirect()->route('admin.dashboard')->with('success', 'Sucursal creada exitosamente.');
     }
+
 
     public function editSucursal($id)
     {

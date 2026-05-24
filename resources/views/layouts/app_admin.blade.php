@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Vieja Guardia - Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+    @vite(['resources/css/app.css'])
 </head>
 <body class="bg-[#FAFAFA] min-h-screen text-slate-900 antialiased selection:bg-slate-200">
     @php
@@ -23,12 +19,14 @@
     @endphp
     
     <!-- Navbar -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-10">
+    <nav class="bg-[#F5EBD6] border-b border-[#E5D5B5] sticky top-0 z-10">
         <div class="max-w-6xl mx-auto px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center space-x-4">
-                    <a href="{{ $dashboardRoute }}" class="text-base font-semibold tracking-tight hover:text-slate-600 transition-colors">La Vieja Guardia</a>
-                    <span class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium border border-slate-200 capitalize">{{ auth()->user()->role ?? 'Admin' }}</span>
+                    <a href="{{ $dashboardRoute }}" class="text-xl font-serif font-bold tracking-tight text-primary hover:opacity-80 transition-opacity flex items-center gap-2">
+                        <span class="text-2xl">🧔🏻‍♂️</span> La Vieja Guardia
+                    </a>
+                    <span class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium border border-slate-200 capitalize">{{ auth()->user()->role ?? 'Administrador' }}</span>
                 </div>
                 
                 <div class="flex items-center space-x-4">
@@ -64,5 +62,34 @@
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formsEliminar = document.querySelectorAll('.form-eliminar');
+            formsEliminar.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const title = this.dataset.title || '¿Estás seguro?';
+                    const warning = this.dataset.warning || 'Esta acción no se puede deshacer.';
+                    
+                    Swal.fire({
+                        title: title,
+                        text: warning,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>

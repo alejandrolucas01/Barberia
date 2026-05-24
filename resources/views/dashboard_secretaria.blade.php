@@ -3,9 +3,18 @@
 @section('content')
     <div class="">
         @if (session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                {{ session('success') }}
-            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: '{{ session('success') }}',
+                        confirmButtonColor: '#10b981',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                });
+            </script>
         @endif
 
         <div class="mb-6">
@@ -90,15 +99,26 @@
                                             </form>
                                         </div>
                                     @else
-                                        <form action="{{ route('secretaria.citas.completar', $cita->id) }}" method="POST"
-                                            class="w-full">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="button"
-                                                class="btn-completar bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 font-bold flex items-center justify-center w-full">
-                                                Finalizar
-                                            </button>
-                                        </form>
+                                        <div class="flex flex-col space-y-2">
+                                            <form action="{{ route('secretaria.citas.completar', $cita->id) }}"
+                                                method="POST" class="w-full">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="button"
+                                                    class="btn-completar bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 font-bold flex items-center justify-center w-full">
+                                                    Finalizar
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('secretaria.citas.cancelar', $cita->id) }}"
+                                                method="POST" class="w-full">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="button"
+                                                    class="btn-cancelar bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600 font-bold flex items-center justify-center w-full">
+                                                    Cancelar
+                                                </button>
+                                            </form>
+                                        </div>
                                     @endif
                                 </td>
                             </tr>
@@ -182,16 +202,27 @@
                 btn.addEventListener('click', function() {
                     const form = this.closest('form');
                     Swal.fire({
-                        title: '¿Confirmar Atención?',
-                        text: "Esta acción marcará la cita como realizada y desaparecerá de la lista pendiente.",
+                        title: '¿Confirmar Atención y Tipo de Pago?',
+                        text: "Selecciona el método de pago con el que el cliente liquidó el servicio:",
                         icon: 'question',
+                        showDenyButton: true,
                         showCancelButton: true,
-                        confirmButtonColor: '#3b82f6', // Azul tailwind
-                        cancelButtonColor: '#ef4444', // Rojo tailwind
-                        confirmButtonText: 'Sí, está realizada',
-                        cancelButtonText: 'Cerrar'
+                        confirmButtonColor: '#10b981', // Verde esmeralda para Contado
+                        denyButtonColor: '#f59e0b', // Ambar para Crédito
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: '💵 Pago en Efectivo',
+                        denyButtonText: '💳 Pago con Tarjeta',
+                        cancelButtonText: 'Cancelar'
                     }).then((result) => {
-                        if (result.isConfirmed) {
+                        if (result.isConfirmed || result.isDenied) {
+                            let inputPago = form.querySelector('input[name="metodo_pago"]');
+                            if (!inputPago) {
+                                inputPago = document.createElement('input');
+                                inputPago.type = 'hidden';
+                                inputPago.name = 'metodo_pago';
+                                form.appendChild(inputPago);
+                            }
+                            inputPago.value = result.isConfirmed ? 'efectivo' : 'tarjeta';
                             form.submit();
                         }
                     });

@@ -9,7 +9,7 @@ class ServicioController extends Controller
 {
     public function index()
     {
-        $servicios = Servicio::all();
+        $servicios = Servicio::paginate(6);
         return view('admin.servicios.index', compact('servicios'));
     }
 

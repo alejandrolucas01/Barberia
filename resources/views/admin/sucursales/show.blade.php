@@ -38,7 +38,7 @@
                                 </div>
                                 <div class="flex space-x-2">
                                     <a href="{{ route('admin.secretarias.edit', $secretaria->id) }}" class="text-sm py-1.5 px-3 text-center bg-white border border-slate-200 text-slate-700 text-xs font-medium rounded-md hover:bg-slate-50 transition-colors">Editar</a>
-                                    <form action="{{ route('admin.secretarias.destroy', $secretaria->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta secretaria?');">
+                                    <form action="{{ route('admin.secretarias.destroy', $secretaria->id) }}" method="POST" class="form-eliminar" data-title="¿Eliminar secretaria?" data-warning="Esta acción no se puede deshacer.">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-sm py-1.5 px-3 text-center bg-white border border-slate-200 text-rose-600 text-xs font-medium rounded-md hover:bg-rose-50 transition-colors">Eliminar</button>
@@ -64,7 +64,7 @@
                                     <p class="text-sm text-gray-500">Tel: {{ $barbero->telefono ?? 'N/A' }}</p>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <form action="{{ route('admin.barberos.destroy', $barbero->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este barbero?');">
+                                    <form action="{{ route('admin.barberos.destroy', $barbero->id) }}" method="POST" class="form-eliminar" data-title="¿Eliminar barbero?" data-warning="Esta acción no se puede deshacer.">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-sm py-1.5 px-3 text-center bg-white border border-slate-200 text-rose-600 text-xs font-medium rounded-md hover:bg-rose-50 transition-colors">Eliminar</button>

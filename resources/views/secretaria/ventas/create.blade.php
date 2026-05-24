@@ -18,9 +18,16 @@
                     <label class="block text-sm font-medium text-slate-700 mb-1.5">1. Buscar y Seleccionar Cliente <span class="text-red-500">*</span></label>
                     <select name="cliente_id" id="cliente_id" class="w-full border p-2 rounded select2" required>
                         <option value="">Escribe para buscar un cliente en el sistema...</option>
-                        @foreach($clientes as $cliente)
-                            <option value="{{ $cliente->id }}">{{ $cliente->nombre }} {{ $cliente->telefono ? '('.$cliente->telefono.')' : '' }}</option>
-                        @endforeach
+                        <optgroup label="📍 Clientes de esta Sucursal">
+                            @foreach($clientesLocal as $cliente)
+                                <option value="{{ $cliente->id }}">{{ $cliente->nombre }} {{ $cliente->telefono ? '('.$cliente->telefono.')' : '' }}</option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="🌐 Clientes de otras Sucursales / Generales">
+                            @foreach($clientesOtros as $cliente)
+                                <option value="{{ $cliente->id }}">{{ $cliente->nombre }} {{ $cliente->telefono ? '('.$cliente->telefono.')' : '' }}</option>
+                            @endforeach
+                        </optgroup>
                     </select>
                 </div>
                 

@@ -12,15 +12,28 @@ class SecretariaController extends Controller
     public function indexClientes(Request $request)
     {
         $sucursal_id = auth()->user()->sucursal_id;
-        $query = Cliente::where('sucursal_id', $sucursal_id);
+        
+        $queryLocal = Cliente::where('sucursal_id', $sucursal_id);
+        $queryOtros = Cliente::where(function($q) use ($sucursal_id) {
+            $q->where('sucursal_id', '!=', $sucursal_id)
+              ->orWhereNull('sucursal_id');
+        });
 
         if ($request->has('search')) {
-            $query->where('nombre', 'LIKE', '%' . $request->search . '%')
+            $queryLocal->where(function($q) use ($request) {
+                $q->where('nombre', 'LIKE', '%' . $request->search . '%')
                   ->orWhere('telefono', 'LIKE', '%' . $request->search . '%');
+            });
+            $queryOtros->where(function($q) use ($request) {
+                $q->where('nombre', 'LIKE', '%' . $request->search . '%')
+                  ->orWhere('telefono', 'LIKE', '%' . $request->search . '%');
+            });
         }
 
-        $clientes = $query->paginate(6);
-        return view('secretaria.clientes.index', compact('clientes'));
+        $clientesLocal = $queryLocal->paginate(6, ['*'], 'page_local');
+        $clientesOtros = $queryOtros->with('sucursal')->paginate(6, ['*'], 'page_otros');
+
+        return view('secretaria.clientes.index', compact('clientesLocal', 'clientesOtros'));
     }
 
     public function createCliente()
@@ -173,7 +186,7 @@ class SecretariaController extends Controller
         return redirect()->route('secretaria.dashboard')->with('success', 'Cita actualizada exitosamente.');
     }
 
-    public function completarCita($id)
+    public function completarCita(Request $request, $id)
     {
         $cita = \App\Models\Cita::findOrFail($id);
         
@@ -184,7 +197,11 @@ class SecretariaController extends Controller
             abort(403);
         }
 
-        $cita->update(['estado' => 'completada']);
+        $metodo_pago = $request->input('metodo_pago', 'efectivo');
+        $cita->update([
+            'estado' => 'completada',
+            'metodo_pago' => $metodo_pago
+        ]);
 
         return redirect()->route('secretaria.dashboard')->with('success', 'Cita marcada como realizada exitosamente.');
     }

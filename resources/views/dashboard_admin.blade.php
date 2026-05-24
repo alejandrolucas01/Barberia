@@ -13,7 +13,7 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <!-- Action Card 1 -->
         <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col group">
             <h3 class="font-semibold text-slate-900 mb-1">Sucursales</h3>
@@ -38,6 +38,15 @@
             <p class="text-sm text-slate-500 mb-6 flex-1">Gestiona el catálogo de cortes y tratamientos.</p>
             <a href="{{ route('admin.servicios.index') }}" class="inline-flex justify-center items-center py-2 px-4 bg-white border border-slate-200 text-slate-900 text-sm font-medium rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors w-full">
                 Gestionar Servicios
+            </a>
+        </div>
+
+        <!-- Action Card 4: Reportes -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col group">
+            <h3 class="font-semibold text-slate-900 mb-1">Reportes</h3>
+            <p class="text-sm text-slate-500 mb-6 flex-1">Gestiona las ventas de sucursales y rentabilidad.</p>
+            <a href="{{ route('admin.reportes.index') }}" class="inline-flex justify-center items-center py-2 px-4 bg-white border border-slate-200 text-slate-900 text-sm font-medium rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors w-full">
+                Generar Reporte
             </a>
         </div>
     </div>
@@ -69,7 +78,7 @@
                             <a href="{{ route('admin.sucursales.edit', $sucursal->id) }}" class="flex-1 py-1.5 px-3 text-center bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-md transition-colors">
                                 Editar
                             </a>
-                            <form action="{{ route('admin.sucursales.destroy', $sucursal->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta sucursal? ATENCIÓN: Esto eliminará también a todas las secretarias y barberos que pertenezcan a ella.');" class="flex-1">
+                            <form action="{{ route('admin.sucursales.destroy', $sucursal->id) }}" method="POST" class="flex-1 form-eliminar">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="w-full py-1.5 px-3 text-center bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 border border-slate-200 text-slate-700 text-xs font-medium rounded-md transition-colors">
@@ -92,5 +101,29 @@
             </div>
         @endif
     </div>
-@endsection
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formsEliminar = document.querySelectorAll('.form-eliminar');
+            formsEliminar.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: '¿Eliminar sucursal?',
+                        text: "ATENCIÓN: Esto eliminará también a todas las secretarias y barberos que pertenezcan a ella. Esta acción no se puede deshacer.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+@endsection

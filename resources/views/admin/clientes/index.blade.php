@@ -38,7 +38,7 @@
                             <td class="border p-2">{{ $cliente->telefono ?? 'N/A' }}</td>
                             <td class="border p-2">{{ $cliente->correo ?? 'N/A' }}</td>
                             <td class="border p-2 text-center">
-                                <form action="{{ route('admin.clientes.destroy', $cliente->id) }}" method="POST" onsubmit="return confirm('¿Eliminar cliente?');" class="inline">
+                                <form action="{{ route('admin.clientes.destroy', $cliente->id) }}" method="POST" class="inline form-eliminar" data-title="¿Eliminar cliente?" data-warning="Esta acción no se puede deshacer.">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-sm py-1.5 px-3 text-center bg-white border border-slate-200 text-rose-600 text-xs font-medium rounded-md hover:bg-rose-50 transition-colors">Eliminar</button>
@@ -48,6 +48,9 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-4">
+                    {{ $clientes->links() }}
+                </div>
             @endif
         </div>
     </div>
