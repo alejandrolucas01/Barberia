@@ -150,14 +150,10 @@ class VentaController extends Controller
             $conflict = Cita::where('barbero_id', $barbero->id)
                 ->where('fecha', $request->fecha)
                 ->where('estado', 'pendiente')
-                ->where(function($query) use ($hora_inicio, $hora_fin) {
-                    $query->whereBetween('hora_inicio', [$hora_inicio->format('H:i:s'), $hora_fin->format('H:i:s')])
-                          ->orWhereBetween('hora_fin', [$hora_inicio->format('H:i:s'), $hora_fin->format('H:i:s')])
-                          ->orWhere(function($q) use ($hora_inicio, $hora_fin) {
-                              $q->where('hora_inicio', '<=', $hora_inicio->format('H:i:s'))
-                                ->where('hora_fin', '>=', $hora_fin->format('H:i:s'));
-                          });
-                })->exists();
+                ->where('cliente_id', '!=', $request->cliente_id)
+                ->where('hora_inicio', '<', $hora_fin->format('H:i'))
+                ->where('hora_fin', '>', $hora_inicio->format('H:i'))
+                ->exists();
             
             if (!$conflict) {
                 $barbero_id = $barbero->id;
@@ -169,23 +165,22 @@ class VentaController extends Controller
             return redirect()->back()->with('error', 'No hay barberos disponibles en el horario solicitado (choca con otra cita).');
         }
 
-        $currentTime = $hora_inicio->copy();
-        foreach ($serviciosSeleccionados as $servicio) {
-            $endTime = $currentTime->copy()->addMinutes($servicio->duracion_minutos);
-            
-            Cita::create([
-                'barbero_id' => $barbero_id,
-                'cliente_id' => $request->cliente_id,
-                'servicio_id' => $servicio->id,
-                'fecha' => $request->fecha,
-                'hora_inicio' => $currentTime->format('H:i'),
-                'hora_fin' => $endTime->format('H:i'),
-                'tipo_atencion' => $request->tipo_atencion,
-                'estado' => 'pendiente'
-            ]);
-            
-            $currentTime = $endTime;
-        }
+        // Create a single Cita row for all selected services
+        $firstServicioId = $serviciosSeleccionados->first()->id;
+
+        $cita = Cita::create([
+            'barbero_id' => $barbero_id,
+            'cliente_id' => $request->cliente_id,
+            'servicio_id' => $firstServicioId, // Backwards-compatible primary service
+            'fecha' => $request->fecha,
+            'hora_inicio' => $hora_inicio->format('H:i'),
+            'hora_fin' => $hora_fin->format('H:i'),
+            'tipo_atencion' => $request->tipo_atencion,
+            'estado' => 'pendiente'
+        ]);
+
+        // Attach all selected services to the pivot table
+        $cita->servicios()->attach($request->servicios);
 
         $barberoObj = Barbero::find($barbero_id);
         $texto = $request->tipo_atencion == 'con_cita' ? 'Cita programada' : 'Atención registrada';
